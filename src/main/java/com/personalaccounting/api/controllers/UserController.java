@@ -3,8 +3,12 @@ package com.personalaccounting.api.controllers;
 import java.util.List;
 
 import com.personalaccounting.api.domain.User;
-import com.personalaccounting.api.exceptions.UserNotFoundException;
-import com.personalaccounting.api.repositories.UserRepository;
+import com.personalaccounting.api.dtos.UserEditDto;
+import com.personalaccounting.api.dtos.UserLoginDto;
+import com.personalaccounting.api.dtos.UserRegisterDto;
+import com.personalaccounting.api.services.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,57 +17,51 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.personalaccounting.api.utils.Utils.apiURL;
+
 @RestController
 class UserController {
 
-    private final UserRepository repository;
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-    UserController(UserRepository repository) {
-        this.repository = repository;
+    private final UserService userService;
+
+    UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    // Aggregate root
-    // tag::get-aggregate-root[]
-    @GetMapping("/api/v1/users")
+    @GetMapping(apiURL + "/users")
     List<User> all() {
-        return repository.findAll();
-    }
-    // end::get-aggregate-root[]
-
-    @PostMapping("/api/v1/users")
-    User newUser(@RequestBody User newUser) {
-        return repository.save(newUser);
+        return userService.getUsers();
     }
 
-    // Single item
-
-    @GetMapping("/api/v1/users/{id}")
+    @GetMapping(apiURL + "/users/{id}")
     User one(@PathVariable Long id) {
-
-        return repository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+        return userService.getUserById(id);
     }
 
-    @PutMapping("/api/v1/users/{id}")
-    User replaceUser(@RequestBody User newUser, @PathVariable Long id) {
-
-        return repository.findById(id)
-                .map(user -> {
-                    user.setType(newUser.getType());
-                    user.setName(newUser.getName());
-                    user.setSurname(newUser.getSurname());
-                    user.setEmail(newUser.getEmail());
-                    user.setPassword(newUser.getPassword());
-                    return repository.save(user);
-                })
-                .orElseGet(() -> {
-                    newUser.setId(id);
-                    return repository.save(newUser);
-                });
+    @PostMapping(apiURL + "/register")
+    User newUser(@RequestBody UserRegisterDto newUser) {
+        return userService.register(newUser);
     }
 
-    @DeleteMapping("/api/v1/users/{id}")
+    @PutMapping(apiURL + "/users/{id}")
+    UserEditDto replaceUser(@RequestBody UserEditDto newUserDto, @PathVariable Long id) {
+        return userService.editUser(newUserDto, id);
+    }
+
+    @DeleteMapping(apiURL + "/users/{id}")
     void deleteUser(@PathVariable Long id) {
-        repository.deleteById(id);
+        userService.deleteUser(id);
+    }
+
+    @PostMapping(apiURL + "/login")
+    User loginUser(@RequestBody UserLoginDto user) {
+        return userService.login(user);
+    }
+
+    @PostMapping(apiURL + "/logout")
+    void logoutUser(@RequestBody User user) {
+        userService.logout(user);
     }
 }

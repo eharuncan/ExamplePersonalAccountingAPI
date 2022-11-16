@@ -1,6 +1,9 @@
 package com.personalaccounting.api.services;
 
 import com.personalaccounting.api.domain.Expense;
+import com.personalaccounting.api.exceptions.ExpenseNotFoundException;
+import com.personalaccounting.api.repositories.ExpenseRepository;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -9,58 +12,35 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Service
 public class ExpenseService {
-    private final List<Expense> expenseListDB;
+    private final ExpenseRepository expenseRepository;
 
-    public ExpenseService(List<Expense> expenseListDB) {
-        this.expenseListDB = expenseListDB;
-    }
-
-    public List<Expense> getExpenses() {
-        return expenseListDB;
+    public ExpenseService(ExpenseRepository expenseRepository) {
+        this.expenseRepository = expenseRepository;
     }
 
     public List<Expense> getExpensesByUserId(Long userId) {
-        return expenseListDB.stream()
-                .filter(expense -> Objects.equals(expense.getUserId(), userId))
-                .collect(Collectors.toList());
+        return expenseRepository.findByUserId(userId);
     }
 
-    public Expense getExpenseByUserIdAndExpenseId(Long userId, Long expenseId) {
-        return expenseListDB.stream()
-                .filter(expense -> Objects.equals(expense.getUserId(), userId) && Objects.equals(expense.getId(), expenseId))
-                .findFirst()
-                .get();
+    public Expense addExpense(Expense newExpense) {
+        return expenseRepository.save(newExpense);
     }
 
-    public boolean addExpense(Long userId, String name, Double amount, Date date, Long categoryId) {
-        long newExpenseId;
-        List<Expense> expenseList = expenseListDB;
-        if (expenseList.size() == 0) {
-            newExpenseId = 1;
-        } else {
-            Expense lastExpense = expenseList.get(expenseList.size() - 1);
-            newExpenseId = lastExpense.getId() + 1;
-        }
-        Expense newExpense = new Expense(userId, name, amount, date, categoryId);
-
-        expenseListDB.add(newExpense);
-        return true;
-
+    public Expense editExpense(Expense newExpense, Long id, Long userId) {
+        Expense foundExpense = expenseRepository.findByIdAndUserId(id, userId);
+        foundExpense.setUserId(newExpense.getUserId());
+        foundExpense.setName(newExpense.getName());
+        foundExpense.setAmount(newExpense.getAmount());
+        foundExpense.setDate(newExpense.getDate());
+        foundExpense.setCategoryId(newExpense.getCategoryId());
+        expenseRepository.save(foundExpense);
+        return foundExpense;
     }
 
-    public boolean editExpense(Long userId, Long id, String editedName, Double editedAmount, Date editedDate, Long editedCategoryId) {
-        Expense expense = getExpenseByUserIdAndExpenseId(userId, id);
-        int index = getExpenses().indexOf(expense);
-        Expense editedExpense = new Expense(userId, editedName, editedAmount, editedDate, editedCategoryId);
-        expenseListDB.set(index, editedExpense);
-        return true;
-    }
-
-    public boolean deleteExpense(Long userId, Long expenseId) {
-        Expense foundExpense = getExpenseByUserIdAndExpenseId(userId, expenseId);
-        expenseListDB.remove(foundExpense);
-        return true;
+    public void deleteExpense(Long userId, Long id) {
+        expenseRepository.deleteById(id);
     }
 
     public Double getSumOfUserExpensesOfDay(Long userId, Date date) {
