@@ -48,15 +48,14 @@ public class ExpenseCategoryService {
     }
 
     public void deleteExpenseCategory(Long id) {
-
         expenseCategoryRepository.deleteById(id);
     }
 
-    public void addDefaultExpenseCategories(Long userId) {
-        ExpenseCategory expenseCategory;
+    public void addDefaultExpenseCategoriesOfUser(Long userId) {
+        ExpenseCategory newExpenseCategory;
         for (String defaultExpenseCategoryName : defaultExpenseCategoryNames) {
-            expenseCategory = new ExpenseCategory(userId, defaultExpenseCategoryName);
-            addExpenseCategory(expenseCategory);
+            newExpenseCategory = new ExpenseCategory(userId, defaultExpenseCategoryName);
+            addExpenseCategory(newExpenseCategory);
         }
     }
 

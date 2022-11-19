@@ -5,8 +5,6 @@ import java.util.Objects;
 
 import javax.persistence.*;
 
-import com.personalaccounting.api.enums.UserTypes;
-
 @Entity
 @Table(name = "expenses")
 public class Expense {

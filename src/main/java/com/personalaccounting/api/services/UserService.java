@@ -38,19 +38,15 @@ public class UserService {
 
     public User register(UserRegisterDto newUserDto) {
         User newUser = UserMapper.INSTANCE.userRegisterDtoToUser(newUserDto);
-
         if (Objects.equals(newUser.getName(), "admin")) {
             newUser.setType(UserTypes.ADMIN);
         } else {
             newUser.setType(UserTypes.CUSTOMER);
         }
-
         User registeredUser = userRepository.save(newUser);
-
         if (registeredUser.getType() == UserTypes.CUSTOMER){
-            expenseCategoryService.addDefaultExpenseCategories(registeredUser.getId());
+            expenseCategoryService.addDefaultExpenseCategoriesOfUser(registeredUser.getId());
         }
-
         return registeredUser;
     }
 

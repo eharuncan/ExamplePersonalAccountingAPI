@@ -2,7 +2,6 @@ package com.personalaccounting.api.services;
 
 import com.personalaccounting.api.domain.Expense;
 import com.personalaccounting.api.dtos.ExpenseAddDto;
-import com.personalaccounting.api.exceptions.ExpenseNotFoundException;
 import com.personalaccounting.api.repositories.ExpenseRepository;
 import org.springframework.stereotype.Service;
 
@@ -48,7 +47,6 @@ public class ExpenseService {
         int year = localDate.getYear();
         int month = localDate.getMonthValue();
         int day = localDate.getDayOfMonth();
-
         List<Expense> currentUsersExpenseList = getExpensesByUserId(userId);
         List<Expense> resultList = currentUsersExpenseList.stream()
                 .filter(expense ->
@@ -66,7 +64,6 @@ public class ExpenseService {
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         int year = localDate.getYear();
         int month = localDate.getMonthValue();
-
         List<Expense> currentUsersExpenseList = getExpensesByUserId(userId);
         List<Expense> resultList = currentUsersExpenseList.stream()
                 .filter(expense ->
@@ -82,7 +79,6 @@ public class ExpenseService {
     public Double getSumOfUserExpensesOfYear(Long userId, java.util.Date date) {
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         int year = localDate.getYear();
-
         List<Expense> currentUsersExpenseList = getExpensesByUserId(userId);
         List<Expense> resultList = currentUsersExpenseList.stream()
                 .filter(expense ->
