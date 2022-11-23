@@ -1,11 +1,8 @@
 package com.personalaccounting.api.domain;
 
-import java.util.Date;
 import java.util.Objects;
 
 import javax.persistence.*;
-
-import com.personalaccounting.api.enums.UserTypes;
 
 @Entity
 @Table(name = "expenseCategories")
