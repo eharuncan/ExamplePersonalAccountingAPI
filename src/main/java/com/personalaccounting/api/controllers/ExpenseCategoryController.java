@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.personalaccounting.api.utils.Utils.apiURL;
+import static com.personalaccounting.api.utils.Utils.API_URL;
 
 @RestController
 class ExpenseCategoryController {
@@ -27,27 +27,27 @@ class ExpenseCategoryController {
         this.expenseCategoryService = expenseCategoryService;
     }
 
-    @GetMapping(apiURL + "/users/{userId}/categories")
+    @GetMapping(API_URL + "/users/{userId}/categories")
     List<ExpenseCategory> all(@PathVariable Long userId) {
         return expenseCategoryService.getExpenseCategoriesByUserId(userId);
     }
 
-    @GetMapping(apiURL + "/users/{userId}/categories/{id}")
+    @GetMapping(API_URL + "/users/{userId}/categories/{id}")
     ExpenseCategory one(@PathVariable Long id) {
         return expenseCategoryService.getExpenseCategoryById(id);
     }
 
-    @PostMapping(apiURL + "/users/{userId}/categories")
+    @PostMapping(API_URL + "/users/{userId}/categories")
     ExpenseCategory newExpenseCategory(@RequestBody ExpenseCategory newExpenseCategory) {
         return expenseCategoryService.addExpenseCategory(newExpenseCategory);
     }
 
-    @PutMapping(apiURL + "/users/{userId}/categories/{id}")
+    @PutMapping(API_URL + "/users/{userId}/categories/{id}")
     ExpenseCategory replaceExpenseCategory(@RequestBody ExpenseCategory newExpenseCategory, @PathVariable Long id) {
         return expenseCategoryService.editExpenseCategory(newExpenseCategory, id);
     }
 
-    @DeleteMapping(apiURL + "/users/{userId}/categories/{id}")
+    @DeleteMapping(API_URL + "/users/{userId}/categories/{id}")
     void deleteExpenseCategory(@PathVariable Long id) {
         log.info("buraya girdi ve id: "+ id.toString());
         expenseCategoryService.deleteExpenseCategory(id);
