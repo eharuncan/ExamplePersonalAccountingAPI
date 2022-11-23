@@ -31,17 +31,17 @@ class UserController {
     }
 
     @GetMapping(API_URL + "/users")
-    List<User> all() {
+    List<User> getUsers() {
         return userService.getUsers();
     }
 
     @GetMapping(API_URL + "/users/{id}")
-    User one(@PathVariable Long id) {
+    User getUser(@PathVariable Long id) {
         return userService.getUserById(id);
     }
 
     @PostMapping(API_URL + "/register")
-    User newUser(@RequestBody UserRegisterDto newUser) {
+    User addUser(@RequestBody UserRegisterDto newUser) {
         return userService.register(newUser);
     }
 

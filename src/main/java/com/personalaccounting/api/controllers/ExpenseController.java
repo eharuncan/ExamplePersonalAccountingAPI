@@ -28,12 +28,12 @@ class ExpenseController {
     }
 
     @GetMapping(API_URL + "/users/{userId}/expenses")
-    List<Expense> all(@PathVariable Long userId) {
+    List<Expense> getExpenses(@PathVariable Long userId) {
         return expenseService.getExpensesByUserId(userId);
     }
 
     @PostMapping(API_URL + "/users/{userId}/expenses")
-    Expense newExpense(@RequestBody Expense newExpense) {
+    Expense addExpense(@RequestBody Expense newExpense) {
         return expenseService.addExpense(newExpense);
     }
 

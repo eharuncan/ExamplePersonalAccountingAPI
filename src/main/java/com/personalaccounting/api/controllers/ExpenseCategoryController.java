@@ -28,17 +28,17 @@ class ExpenseCategoryController {
     }
 
     @GetMapping(API_URL + "/users/{userId}/categories")
-    List<ExpenseCategory> all(@PathVariable Long userId) {
+    List<ExpenseCategory> getExpenseCategories(@PathVariable Long userId) {
         return expenseCategoryService.getExpenseCategoriesByUserId(userId);
     }
 
     @GetMapping(API_URL + "/users/{userId}/categories/{id}")
-    ExpenseCategory one(@PathVariable Long id) {
+    ExpenseCategory getExpenseCategory(@PathVariable Long id) {
         return expenseCategoryService.getExpenseCategoryById(id);
     }
 
     @PostMapping(API_URL + "/users/{userId}/categories")
-    ExpenseCategory newExpenseCategory(@RequestBody ExpenseCategory newExpenseCategory) {
+    ExpenseCategory addExpenseCategory(@RequestBody ExpenseCategory newExpenseCategory) {
         return expenseCategoryService.addExpenseCategory(newExpenseCategory);
     }
 
