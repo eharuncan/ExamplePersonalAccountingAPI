@@ -4,15 +4,27 @@ import com.personalaccounting.api.enums.UserTypes;
 
 public class UserEditDto {
 
-    private Long id;
+    private final Long id;
     private UserTypes type;
     private String name;
     private String surname;
     private String email;
     private String password;
 
+    public UserEditDto(Long id, UserTypes type, String name, String surname, String email, String password) {
+        this.id = id;
+        this.type = type;
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.password = password;
+    }
+
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
     }
 
     public UserTypes getType() {
@@ -55,6 +67,4 @@ public class UserEditDto {
         this.password = password;
     }
 
-    public void setId(Long id) {
-    }
 }

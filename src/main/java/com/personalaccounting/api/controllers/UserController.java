@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.personalaccounting.api.utils.Utils.apiURL;
+import static com.personalaccounting.api.utils.Utils.API_URL;
 
 @RestController
 class UserController {
@@ -30,37 +30,37 @@ class UserController {
         this.userService = userService;
     }
 
-    @GetMapping(apiURL + "/users")
-    List<User> all() {
+    @GetMapping(API_URL + "/users")
+    List<User> getUsers() {
         return userService.getUsers();
     }
 
-    @GetMapping(apiURL + "/users/{id}")
-    User one(@PathVariable Long id) {
+    @GetMapping(API_URL + "/users/{id}")
+    User getUser(@PathVariable Long id) {
         return userService.getUserById(id);
     }
 
-    @PostMapping(apiURL + "/register")
-    User newUser(@RequestBody UserRegisterDto newUser) {
+    @PostMapping(API_URL + "/register")
+    User addUser(@RequestBody UserRegisterDto newUser) {
         return userService.register(newUser);
     }
 
-    @PutMapping(apiURL + "/users/{id}")
+    @PutMapping(API_URL + "/users/{id}")
     UserEditDto replaceUser(@RequestBody UserEditDto newUserDto, @PathVariable Long id) {
         return userService.editUser(newUserDto, id);
     }
 
-    @DeleteMapping(apiURL + "/users/{id}")
+    @DeleteMapping(API_URL + "/users/{id}")
     void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
     }
 
-    @PostMapping(apiURL + "/login")
+    @PostMapping(API_URL + "/login")
     User loginUser(@RequestBody UserLoginDto user) {
         return userService.login(user);
     }
 
-    @PostMapping(apiURL + "/logout")
+    @PostMapping(API_URL + "/logout")
     void logoutUser(@RequestBody User user) {
         userService.logout(user);
     }

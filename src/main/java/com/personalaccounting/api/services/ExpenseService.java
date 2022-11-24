@@ -1,7 +1,7 @@
 package com.personalaccounting.api.services;
 
 import com.personalaccounting.api.domain.Expense;
-import com.personalaccounting.api.exceptions.ExpenseNotFoundException;
+import com.personalaccounting.api.dtos.ExpenseAddDto;
 import com.personalaccounting.api.repositories.ExpenseRepository;
 import org.springframework.stereotype.Service;
 
@@ -28,18 +28,17 @@ public class ExpenseService {
         return expenseRepository.save(newExpense);
     }
 
-    public Expense editExpense(Expense newExpense, Long id, Long userId) {
+    public Expense editExpense(ExpenseAddDto newExpenseDto, Long id, Long userId) {
         Expense foundExpense = expenseRepository.findByIdAndUserId(id, userId);
-        foundExpense.setUserId(newExpense.getUserId());
-        foundExpense.setName(newExpense.getName());
-        foundExpense.setAmount(newExpense.getAmount());
-        foundExpense.setDate(newExpense.getDate());
-        foundExpense.setCategoryId(newExpense.getCategoryId());
+        foundExpense.setName(newExpenseDto.getName());
+        foundExpense.setAmount(newExpenseDto.getAmount());
+        foundExpense.setDate(newExpenseDto.getDate());
+        foundExpense.setCategoryId(newExpenseDto.getCategoryId());
         expenseRepository.save(foundExpense);
         return foundExpense;
     }
 
-    public void deleteExpense(Long userId, Long id) {
+    public void deleteExpense(Long id) {
         expenseRepository.deleteById(id);
     }
 
@@ -48,7 +47,6 @@ public class ExpenseService {
         int year = localDate.getYear();
         int month = localDate.getMonthValue();
         int day = localDate.getDayOfMonth();
-
         List<Expense> currentUsersExpenseList = getExpensesByUserId(userId);
         List<Expense> resultList = currentUsersExpenseList.stream()
                 .filter(expense ->
@@ -66,7 +64,6 @@ public class ExpenseService {
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         int year = localDate.getYear();
         int month = localDate.getMonthValue();
-
         List<Expense> currentUsersExpenseList = getExpensesByUserId(userId);
         List<Expense> resultList = currentUsersExpenseList.stream()
                 .filter(expense ->
@@ -82,7 +79,6 @@ public class ExpenseService {
     public Double getSumOfUserExpensesOfYear(Long userId, java.util.Date date) {
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         int year = localDate.getYear();
-
         List<Expense> currentUsersExpenseList = getExpensesByUserId(userId);
         List<Expense> resultList = currentUsersExpenseList.stream()
                 .filter(expense ->

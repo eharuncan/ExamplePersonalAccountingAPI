@@ -38,37 +38,34 @@ public class UserService {
 
     public User register(UserRegisterDto newUserDto) {
         User newUser = UserMapper.INSTANCE.userRegisterDtoToUser(newUserDto);
-
         if (Objects.equals(newUser.getName(), "admin")) {
             newUser.setType(UserTypes.ADMIN);
         } else {
             newUser.setType(UserTypes.CUSTOMER);
         }
-
         User registeredUser = userRepository.save(newUser);
-
-        expenseCategoryService.addDefaultExpenseCategories(registeredUser.getId());
-
+        if (registeredUser.getType() == UserTypes.CUSTOMER){
+            expenseCategoryService.addDefaultExpenseCategoriesOfUser(registeredUser.getId());
+        }
         return registeredUser;
     }
 
     public UserEditDto editUser(UserEditDto newUserDto, Long id) {
-        log.info(newUserDto.toString());
-        User newUser = UserMapper.INSTANCE.userEditDtoToUser(newUserDto);
         userRepository.findById(id)
                 .map(user -> {
-                    user.setName(newUser.getName());
-                    user.setSurname(newUser.getSurname());
-                    user.setEmail(newUser.getEmail());
-                    user.setPassword(newUser.getPassword());
+                    user.setName(newUserDto.getName());
+                    user.setSurname(newUserDto.getSurname());
+                    user.setEmail(newUserDto.getEmail());
+                    user.setPassword(newUserDto.getPassword());
                     return userRepository.save(user);
                 })
                 .orElseGet(() -> {
+                    User newUser = UserMapper.INSTANCE.userEditDtoToUser(newUserDto);
                     newUser.setId(id);
+                    newUser.setType(UserTypes.CUSTOMER);
                     return userRepository.save(newUser);
                 });
-        log.info(newUser.toString());
-        return UserMapper.INSTANCE.userToUserEditDto(newUser);
+        return newUserDto;
     }
 
     public void deleteUser(Long id) {

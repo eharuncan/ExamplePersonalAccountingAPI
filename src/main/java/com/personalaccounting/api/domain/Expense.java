@@ -5,8 +5,6 @@ import java.util.Objects;
 
 import javax.persistence.*;
 
-import com.personalaccounting.api.enums.UserTypes;
-
 @Entity
 @Table(name = "expenses")
 public class Expense {
@@ -28,18 +26,18 @@ public class Expense {
         this.categoryId = categoryId;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
     public Long getId() {
         return id;
     }
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getName() {

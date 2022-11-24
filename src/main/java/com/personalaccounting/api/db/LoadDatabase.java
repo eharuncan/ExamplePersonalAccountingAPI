@@ -20,7 +20,6 @@ class LoadDatabase {
 
     @Bean
     CommandLineRunner initDatabase() {
-
         return args -> {
             log.info("Preloading " + userService.register(new UserRegisterDto("admin", "admin", "admin", "admin")));
             log.info("Preloading " + userService.register(new UserRegisterDto("customer1", "customer1", "1", "1")));
