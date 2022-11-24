@@ -1,7 +1,8 @@
 package com.personalaccounting.api.db;
 
 import com.personalaccounting.api.domain.User;
-import com.personalaccounting.api.domain.UserRepository;
+import com.personalaccounting.api.repositories.UserRepository;
+
 import com.personalaccounting.api.enums.UserTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
