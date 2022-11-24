@@ -3,18 +3,15 @@ package com.personalaccounting.api.domain;
 import java.util.Date;
 import java.util.Objects;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.personalaccounting.api.enums.UserTypes;
 
 @Entity
-@Table(name = "expense-categories")
+@Table(name = "expenseCategories")
 public class ExpenseCategory {
 
-    private @Id @GeneratedValue Long id;
+    private @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
     private Long userId;
     private String name;
 

@@ -3,132 +3,85 @@ package com.personalaccounting.api.services;
 import java.util.*;
 
 import com.personalaccounting.api.domain.User;
+import com.personalaccounting.api.dtos.UserEditDto;
+import com.personalaccounting.api.dtos.UserLoginDto;
+import com.personalaccounting.api.dtos.UserRegisterDto;
 import com.personalaccounting.api.enums.UserTypes;
+import com.personalaccounting.api.exceptions.UserNotFoundException;
+import com.personalaccounting.api.mappers.UserMapper;
+import com.personalaccounting.api.repositories.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-import static com.personalaccounting.api.ApiApplication.expenseCategoryService;
-
+@Service
 public class UserService {
-    private final List<User> userListDB;
-    private User currentUser;
 
-    public UserService(List<User> userListDB) {
-        this.userListDB = userListDB;
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
-        register("admin", "admin", "admin", "admin", "admin");
-        register("customer1", "customer1", "1", "1", "1");
+    private final UserRepository userRepository;
+    private final ExpenseCategoryService expenseCategoryService;
 
-        currentUser = null;
+    public UserService(UserRepository userRepository, ExpenseCategoryService expenseCategoryService) {
+        this.userRepository = userRepository;
+        this.expenseCategoryService = expenseCategoryService;
     }
 
     public List<User> getUsers() {
-        return userListDB;
+        return userRepository.findAll();
     }
 
-    public User getUserById(Long userId) {
-        return userListDB.stream()
-                .filter(user -> Objects.equals(user.getId(), userId))
-                .findFirst()
-                .get();
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 
-    public User getUserByEmailAndPassword(String email, String password) {
-        return userListDB.stream()
-                .filter(user -> Objects.equals(user.getEmail(), email) && Objects.equals(user.getPassword(), password))
-                .findFirst()
-                .get();
-    }
+    public User register(UserRegisterDto newUserDto) {
+        User newUser = UserMapper.INSTANCE.userRegisterDtoToUser(newUserDto);
 
-    public boolean register(String name, String surname, String email, String password, String retypedPassword) {
-
-        if (checkPasswords(password, retypedPassword)) {
-
-            long newUserId;
-            List<User> userList = userListDB;
-            if (userList.size() == 0) {
-                newUserId = 1;
-            } else {
-                User lastUser = userList.get(userList.size() - 1);
-                newUserId = lastUser.getId() + 1;
-            }
-
-            if (!expenseCategoryService.addDefaultExpenseCategories(newUserId)) {
-                return false;
-            }
-
-            UserTypes selectedUserType;
-            if (Objects.equals(name, "admin")) {
-                selectedUserType = UserTypes.ADMIN;
-            } else {
-                selectedUserType = UserTypes.CUSTOMER;
-            }
-
-            User newUser = new User(selectedUserType, name, surname, email, password);
-            userListDB.add(newUser);
-            currentUser = newUser;
-            return true;
-
-        }else {
-            return false;
-        }
-
-    }
-
-    public boolean editUser(Long id, String editedName, String editedSurname, String editedEmail, String editedPassword, String retypedPassword) {
-        if (this.checkPasswords(editedPassword, retypedPassword)) {
-            User editedUser = new User(UserTypes.CUSTOMER, editedName, editedSurname, editedEmail, editedPassword);
-            int index = getUsers().indexOf(getUserById(id));
-            userListDB.set(index, editedUser);
-            return true;
+        if (Objects.equals(newUser.getName(), "admin")) {
+            newUser.setType(UserTypes.ADMIN);
         } else {
-            return false;
+            newUser.setType(UserTypes.CUSTOMER);
         }
+
+        User registeredUser = userRepository.save(newUser);
+
+        expenseCategoryService.addDefaultExpenseCategories(registeredUser.getId());
+
+        return registeredUser;
     }
 
-    public boolean deleteUser(Long userId) {
-        if (userId == 1) {
-            return false;
-        } else {
-            User foundUser = getUserById(userId);
-            userListDB.remove(foundUser);
-            return true;
-        }
+    public UserEditDto editUser(UserEditDto newUserDto, Long id) {
+        log.info(newUserDto.toString());
+        User newUser = UserMapper.INSTANCE.userEditDtoToUser(newUserDto);
+        userRepository.findById(id)
+                .map(user -> {
+                    user.setName(newUser.getName());
+                    user.setSurname(newUser.getSurname());
+                    user.setEmail(newUser.getEmail());
+                    user.setPassword(newUser.getPassword());
+                    return userRepository.save(user);
+                })
+                .orElseGet(() -> {
+                    newUser.setId(id);
+                    return userRepository.save(newUser);
+                });
+        log.info(newUser.toString());
+        return UserMapper.INSTANCE.userToUserEditDto(newUser);
     }
 
-    public boolean login(String email, String password) {
-        if (checkUser(email, password)) {
-            currentUser = getUserByEmailAndPassword(email, password);
-            return true;
-        } else {
-            System.out.println("\nHata: Sistemde bu bilgilere sahip bir kullanıcı bulunamadı.");
-            return false;
-        }
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
     }
 
-    public boolean logout() {
+    public User login(UserLoginDto user) {
+        return userRepository.findByEmailAndPassword(user.getEmail(), user.getPassword());
+    }
+
+    public void logout(User user) {
         // Burada user adına tutulan oturum açma bilgileri silinir.
-        currentUser = null;
-        return true;
     }
 
-    public boolean checkPasswords(String firstPassword, String secondPassword) {
-        if (Objects.equals(firstPassword, secondPassword)) {
-            return true;
-        } else {
-            System.out.println("\nHata: Şifreler Uyuşmuyor. Lütfen tekrar giriniz.");
-            return false;
-        }
-    }
 
-    public boolean checkUser(String email, String password) {
-        return userListDB.stream()
-                .anyMatch(user -> Objects.equals(user.getEmail(), email) && Objects.equals(user.getPassword(), password));
-    }
-
-    public User getCurrentUser() {
-        return currentUser;
-    }
-
-    public void setCurrentUser(User currentUser) {
-        this.currentUser = currentUser;
-    }
 }

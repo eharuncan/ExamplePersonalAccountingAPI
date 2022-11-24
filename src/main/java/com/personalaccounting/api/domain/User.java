@@ -2,10 +2,7 @@ package com.personalaccounting.api.domain;
 
 import java.util.Objects;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.personalaccounting.api.enums.UserTypes;
 
@@ -13,7 +10,7 @@ import com.personalaccounting.api.enums.UserTypes;
 @Table(name = "users")
 public class User {
 
-    private @Id @GeneratedValue Long id;
+    private @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
     private UserTypes type;
     private String name;
     private String surname;
@@ -22,8 +19,7 @@ public class User {
 
     public User() {}
 
-    public User(UserTypes type, String name, String surname, String email, String password) {
-        this.type = type;
+    public User(String name, String surname, String email, String password) {
         this.name = name;
         this.surname = surname;
         this.email = email;
