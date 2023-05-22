@@ -1,4 +1,4 @@
-# example-personal-accounting-api
+# example-personal-accounting-web-api
 An Example Web API 
 
 includes Spring Boot and RESTful APIs
